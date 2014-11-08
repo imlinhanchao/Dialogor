@@ -1,0 +1,21 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Dialog Demo</title>
+		<link href="./css/Dialogor.css" rel="stylesheet" type="text/css" />
+		<link href="./css/common.css" rel="stylesheet" type="text/css" />
+		<link href="./css/styles.css" rel="stylesheet" type="text/css" />
+		<script type="text/javascript">
+			window.onload = function()
+			{
+				document.getElementById("closedlg").onclick = function(){
+					return Dialogor.CloseParent();
+				};
+			}
+		</script>
+	</head>
+	<body >
+		<a href="#" id="closedlg">關閉對話框</a>
+	</body>
+</html>

@@ -1,0 +1,7 @@
+#dlg_view, #dlg_bg{width:100%;height:100%;position:fixed;_position:absolute;top:0;left:0;}
+#dlg_bg{filter:alpha(opacity=50);opacity: 0.2;background: #000;}
+#dlg_main{background-color:#fff;border: #ccc 1px solid;width:300px;position: absolute;_position:absolute;top: 50%;left: 50%;margin:auto;}
+#dlg_main #dlg_title{height: 30px;padding: 0 0 0 10px;background: #007bbb;color: #FFF;line-height: 30px;cursor: move;}
+#dlg_main #dlg_title h4{float:left;padding:0;margin:0;font-size:14px;}
+#dlg_main #dlg_close{float:right;cursor:pointer;width: 30px;text-align: center;}
+#dlg_main #dlg_resize{width: 40px;height: 40px;cursor: nw-resize;right: -20px;bottom: -20px;position: absolute;}

@@ -1,0 +1,10 @@
+@charset "utf-8";
+body {color:#000;width:100%;margin:0 auto;
+font: 100% "Microsoft YaHei UI", "Microsoft Yahei","PingHei","Lucida Grande", "Lucida Sans Unicode", "Helvetica","Arial","Verdana","sans-serif";}
+input{font: 100% "Microsoft YaHei UI", "Microsoft Yahei","PingHei","Lucida Grande", "Lucida Sans Unicode", "Helvetica","Arial","Verdana","sans-serif";}
+.hide{display:none;}
+a img{border:none;}
+a{text-decoration:none;color:#000;}
+a:hover{text-decoration:underline;}
+a, area{blr:expression(this.onFocus=this.blur());}
+:focus{-moz-outline-style:none;hidefocus:hidefocus;outline:none;}

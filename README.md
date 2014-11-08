@@ -1,4 +1,4 @@
 Dialogor
 ========
 
-A Web Dialogor plugin
+A Web Dialog plugin

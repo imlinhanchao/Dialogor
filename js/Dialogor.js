@@ -11,6 +11,7 @@
 		Clone	: function()
 		{
 			var _Config = {};
+			_Config.resize	= this.resize;
 			_Config.move	= this.move;
 			_Config.width	= this.width;
 			_Config.height	= this.height;
@@ -135,54 +136,64 @@
 			break;
 		}
 		
-				
+		
 		var move = false;
 		OpenConfig.Win.onmouseout = OpenConfig.Win.onmouseup = myDocument.onmouseout = myDocument.onmouseup = function(){move = false;}
-		dlg_title.onmousedown = function(ev)
+		if(OpenConfig.move)
 		{
-			move = true;
-			var mc = Dialogor.mouseCoords(ev);
-			var mx = mc.x;
-			var my = mc.y;
-			dlg_title.onmouseout =  dlg_title.onmouseup = function(ev){ move = false; }
-			dlg_title.onmousemove = function(ev){
-				ev = ev || window.event; 
+			dlg_title.onmousedown = function(ev)
+			{
+				move = true;
 				var mc = Dialogor.mouseCoords(ev);
-				if(move){
-					var x = mc.x - mx;	
-					var y = mc.y - my;	
-					dlg_main.style.left = parseInt(dlg_main.style.left) + x + "px";
-					dlg_main.style.top  = parseInt(dlg_main.style.top)  + y + "px";
+				var mx = mc.x;
+				var my = mc.y;
+				dlg_title.onmouseout =  dlg_title.onmouseup = function(ev){ move = false; }
+				dlg_title.onmousemove = function(ev){
+					ev = ev || window.event; 
+					var mc = Dialogor.mouseCoords(ev);
+					if(move){
+						var x = mc.x - mx;	
+						var y = mc.y - my;	
+						dlg_main.style.left = parseInt(dlg_main.style.left) + x + "px";
+						dlg_main.style.top  = parseInt(dlg_main.style.top)  + y + "px";
+					}
+					mx = mc.x;
+					my = mc.y;
+					return false;
 				}
-				mx = mc.x;
-				my = mc.y;
-				return false;
 			}
 		}
-		
-		dlg_resize.onmousedown = function(ev)
+		else
 		{
-			move = true;
-			var mc = Dialogor.mouseCoords(ev);
-			var mx = mc.x;
-			var my = mc.y;
-			dlg_resize.onmouseout =  dlg_resize.onmouseup = function(ev){ move = false; }
-			dlg_resize.onmousemove = function(ev){
-				ev = ev || window.event; 
+			dlg_title.style.cursor = "default";
+		}
+		
+		if(OpenConfig.resize)
+		{
+			dlg_resize.onmousedown = function(ev)
+			{
+				move = true;
 				var mc = Dialogor.mouseCoords(ev);
-				if(move){
-					var x = mc.x - mx;	
-					var y = mc.y - my;	
-					if("iframe" == type)
-					{
-						dlg_content.height = (parseInt(dlg_main.style.width) + x - 30) + "px";
+				var mx = mc.x;
+				var my = mc.y;
+				dlg_resize.onmouseout =  dlg_resize.onmouseup = function(ev){ move = false; }
+				dlg_resize.onmousemove = function(ev){
+					ev = ev || window.event; 
+					var mc = Dialogor.mouseCoords(ev);
+					if(move){
+						var x = mc.x - mx;	
+						var y = mc.y - my;	
+						if("iframe" == type)
+						{
+							dlg_content.height = (parseInt(dlg_main.style.width) + x - 30) + "px";
+						}
+						dlg_main.style.width = parseInt(dlg_main.style.width) + x + "px";
+						dlg_main.style.height  = parseInt(dlg_main.style.height)  + y + "px";
 					}
-					dlg_main.style.width = parseInt(dlg_main.style.width) + x + "px";
-					dlg_main.style.height  = parseInt(dlg_main.style.height)  + y + "px";
+					mx = mc.x;
+					my = mc.y;
+					return false;
 				}
-				mx = mc.x;
-				my = mc.y;
-				return false;
 			}
 		}
 		
@@ -191,7 +202,7 @@
 		dlg_title.appendChild(dlg_text);
 		dlg_title.appendChild(dlg_close);
 		dlg_box.appendChild(dlg_content);
-		dlg_box.appendChild(dlg_resize);
+		if(OpenConfig.resize)	dlg_box.appendChild(dlg_resize);
 		dlg_main.appendChild(dlg_title);
 		dlg_main.appendChild(dlg_box);
 		dlg_view.appendChild(dlg_main);

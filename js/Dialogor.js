@@ -7,7 +7,20 @@
 		type	: "iframe",
 		content	: "#",
 		title	: "Dialogor",
-		doct	: window.document
+		Win		: window,
+		Clone	: function()
+		{
+			var _Config = {};
+			_Config.move	= this.move;
+			_Config.width	= this.width;
+			_Config.height	= this.height;
+			_Config.type	= this.type;
+			_Config.title	= this.title;
+			_Config.content	= this.content;
+			_Config.Win		= this.Win;
+			_Config.Clone	= this.Clone;
+			return _Config;
+		}
 	},
 	
 	OnLoad : function(selector, type)
@@ -49,7 +62,7 @@
 	
 	GetConfig : function(config)
 	{
-		var ConfigTemp = this.Config;
+		var ConfigTemp = this.Config.Clone();
 		if(undefined == config)  return ConfigTemp;
 		if(undefined != config.resize) 	ConfigTemp.resize	= config.resize;
 		if(undefined != config.move) 	ConfigTemp.move		= config.move;
@@ -58,43 +71,44 @@
 		if(undefined != config.type) 	ConfigTemp.type		= config.type;
 		if(undefined != config.title) 	ConfigTemp.title	= config.title;
 		if(undefined != config.content) ConfigTemp.content	= config.content;
-		if(undefined != config.doct) 	ConfigTemp.doct		= config.doct;
+		if(undefined != config.Win) 	ConfigTemp.Win		= config.Win;
 		return ConfigTemp;
 	},
 	
 	Open : function (config)
 	{
 		var OpenConfig = this.GetConfig(config);
-		var view = this.getView(OpenConfig.doct);
+		var myDocument = OpenConfig.Win.document;
+		var view = this.getView(myDocument);
 		if(OpenConfig.height > view.height)
 			OpenConfig.height = view.height - 100;
 		if(OpenConfig.width > view.width)
 			OpenConfig.width = view.width - 100;
 		
-		var dlg_bg = OpenConfig.doct.createElement("div");
+		var dlg_bg = myDocument.createElement("div");
 		dlg_bg.id = "dlg_bg";
-		var dlg_view = OpenConfig.doct.createElement("div");
+		var dlg_view = myDocument.createElement("div");
 		dlg_view.id = "dlg_view";
 		
-		var dlg_main = OpenConfig.doct.createElement("div");
+		var dlg_main = myDocument.createElement("div");
 		dlg_main.id = "dlg_main";
 		dlg_main.style.width = OpenConfig.width + "px";
 		dlg_main.style.height = OpenConfig.height + "px";
 		dlg_main.style.left = (view.width - OpenConfig.width) / 2 + "px";
 		dlg_main.style.top = (view.height - OpenConfig.height)/ 2 + "px";
-		var dlg_title = OpenConfig.doct.createElement("div");
+		var dlg_title = myDocument.createElement("div");
 		dlg_title.id = "dlg_title";
-		var dlg_text = OpenConfig.doct.createElement("h4");
+		var dlg_text = myDocument.createElement("h4");
 		dlg_text.id = "dlg_title";
-		var dlg_close = OpenConfig.doct.createElement("span");
+		var dlg_close = myDocument.createElement("span");
 		dlg_close.id = "dlg_close";
-		var dlg_box = OpenConfig.doct.createElement("div");
+		var dlg_box = myDocument.createElement("div");
 		dlg_box.id = "dlg_content";
 		
-		var dlg_resize = OpenConfig.doct.createElement("div");
+		var dlg_resize = myDocument.createElement("div");
 		dlg_resize.id = "dlg_resize";
 
-		dlg_close.onclick = this.Close;
+		dlg_close.onclick = function() { return OpenConfig.Win.Dialogor.Close(); };
 		
 		var dlg_content;
 		var type = OpenConfig.type;
@@ -102,7 +116,7 @@
 		switch(type)
 		{
 		case "iframe":
-			dlg_content = OpenConfig.doct.createElement("iframe");
+			dlg_content = myDocument.createElement("iframe");
 			dlg_content.src = content;
 			dlg_content.width = "100%";
 			dlg_content.height = (OpenConfig.height - 30) + "px";
@@ -113,17 +127,17 @@
 			dlg_content.marginwidth = "0";
 			break;
 		case "text":
-			dlg_content = OpenConfig.doct.createTextNode(content);
+			dlg_content = myDocument.createTextNode(content);
 			break;
 		case "id":
-			dlg_content = OpenConfig.doct.getElementById(content).cloneNode(true);
+			dlg_content = myDocument.getElementById(content).cloneNode(true);
 			dlg_content.id = "dlg_box";
 			break;
 		}
 		
 				
 		var move = false;
-		window.onmouseout = window.onmouseup = OpenConfig.doct.onmouseout = OpenConfig.doct.onmouseup = function(){move = false;}
+		OpenConfig.Win.onmouseout = OpenConfig.Win.onmouseup = myDocument.onmouseout = myDocument.onmouseup = function(){move = false;}
 		dlg_title.onmousedown = function(ev)
 		{
 			move = true;
@@ -172,8 +186,8 @@
 			}
 		}
 		
-		dlg_text.appendChild(OpenConfig.doct.createTextNode(OpenConfig.title));
-		dlg_close.appendChild(OpenConfig.doct.createTextNode("×"));
+		dlg_text.appendChild(myDocument.createTextNode(OpenConfig.title));
+		dlg_close.appendChild(myDocument.createTextNode("×"));
 		dlg_title.appendChild(dlg_text);
 		dlg_title.appendChild(dlg_close);
 		dlg_box.appendChild(dlg_content);
@@ -181,44 +195,47 @@
 		dlg_main.appendChild(dlg_title);
 		dlg_main.appendChild(dlg_box);
 		dlg_view.appendChild(dlg_main);
-		OpenConfig.doct.body.appendChild(dlg_bg);
-		OpenConfig.doct.body.appendChild(dlg_view);
+		myDocument.body.appendChild(dlg_bg);
+		myDocument.body.appendChild(dlg_view);
 		
-		dlg_content.contentWindow.Dialogor = window.Dialogor;
-		dlg_content.contentWindow.Dialogor.Config.doct = dlg_content.contentWindow.document;
+		dlg_content.contentWindow.Dialogor = OpenConfig.Win.Dialogor.Clone();
+		dlg_content.contentWindow.Dialogor.Config.Win = dlg_content.contentWindow;
 
 		return false;
 	},
 	
 	Close : function()
 	{
-		var dlg_view = Dialogor.Config.doct.getElementById("dlg_view");
-		var dlg_bg = Dialogor.Config.doct.getElementById("dlg_bg");
+		var myDocument = this.Config.Win.document;
+		var dlg_view = myDocument.getElementById("dlg_view");
+		var dlg_bg = myDocument.getElementById("dlg_bg");
 		if(dlg_view) dlg_view.parentNode.removeChild(dlg_view); 
 		if(dlg_bg) dlg_bg.parentNode.removeChild(dlg_bg); 
 		return false;
 	},
 	
-	CloseDoct : function(doct)
+	CloseWindow : function(win)
 	{
-		var dlg_view = doct.getElementById("dlg_view");
-		var dlg_bg = doct.getElementById("dlg_bg");
-		if(dlg_view) dlg_view.parentNode.removeChild(dlg_view); 
-		if(dlg_bg) dlg_bg.parentNode.removeChild(dlg_bg); 
+		if(null == win.Dialogor)
+		{
+			win.Dialogor = Dialogor.Config.Win.Dialogor.Clone();
+			win.Dialogor.Config.Win = parent;
+		}
+		win.Dialogor.Close();
 		return false;
 	},
 	
 	CloseParent : function()
 	{
-		if(parent) Dialogor.CloseDoct(parent.document);
+		if(parent) Dialogor.CloseWindow(parent);
 	},
 	
 	OpenParent : function (config)
 	{
 		if(!parent) return false;
-		config.doct = parent.document;
-		parent.Dialogor = window.Dialogor;
-		parent.Dialogor.Config.doct = parent.document;
+		config.Win = parent;
+		parent.Dialogor = Dialogor.Config.Win.Dialogor.Clone();
+		parent.Dialogor.Config.Win = parent;
 		return parent.Dialogor.Open(config);
 	},
 
@@ -226,7 +243,8 @@
 		if (!attributes) return;  
 		var hash = {};  
 		  
-		for (var attribute, i = 0, j = attributes.length; i < j; i++) {  
+		for (var attribute, i = 0, j = attributes.length; i < j; i++) 
+		{  
 			attribute = attributes[i];  
 			if(attribute.nodeName.indexOf('data-') != -1){  
 				hash[attribute.nodeName.slice(5)] = attribute.nodeValue;  
@@ -238,20 +256,21 @@
 	
 	getView : function (element)
 	{
-		if(element != this.Config.doct)
+		var myDocument = this.Config.Win.document;
+		if(element != myDocument)
 			return {
 				width: element.offsetWidth,
 				height: element.offsetHeight
 			}
-		if (this.Config.doct.compatMode == "BackCompat"){
+		if (myDocument.compatMode == "BackCompat"){
 			return {
-				width: this.Config.doct.body.clientWidth,
-				height: this.Config.doct.body.clientHeight
+				width: myDocument.body.clientWidth,
+				height: myDocument.body.clientHeight
 			}
 		} else {
 			return {
-				width: this.Config.doct.documentElement.clientWidth,
-				height: this.Config.doct.documentElement.clientHeight
+				width: myDocument.documentElement.clientWidth,
+				height: myDocument.documentElement.clientHeight
 			}
 		}
 	},
@@ -259,12 +278,32 @@
 	//获取鼠标坐标
 	mouseCoords : function (ev) 
 	{ 
+		var myDocument = this.Config.Win.document;
 		if(ev.pageX || ev.pageY){ 
 			return {x:ev.pageX, y:ev.pageY}; 
 		} 
 		return { 
-			x:ev.clientX + this.Config.doct.body.scrollLeft - this.Config.doct.body.clientLeft, 
-			y:ev.clientY + this.Config.doct.body.scrollTop - this.Config.doct.body.clientTop 
+			x:ev.clientX + myDocument.body.scrollLeft - myDocument.body.clientLeft, 
+			y:ev.clientY + myDocument.body.scrollTop - myDocument.body.clientTop 
 		};
-	} 
+	},
+	
+	Clone : function()
+	{
+		var _Dialogor = {};
+		_Dialogor.Close 		= this.Close;
+		_Dialogor.CloseParent 	= this.CloseParent;
+		_Dialogor.CloseWindow 	= this.CloseWindow;
+		_Dialogor.Config 		= this.Config.Clone();
+		_Dialogor.Default 		= this.Default;
+		_Dialogor.GetConfig 	= this.GetConfig;
+		_Dialogor.OnLoad 		= this.OnLoad;
+		_Dialogor.Open 			= this.Open;
+		_Dialogor.OpenParent 	= this.OpenParent;
+		_Dialogor.getDataset 	= this.getDataset;
+		_Dialogor.getView 		= this.getView;
+		_Dialogor.mouseCoords 	= this.mouseCoords;
+		_Dialogor.Clone 		= this.Clone;
+		return _Dialogor;		
+	}
 }
